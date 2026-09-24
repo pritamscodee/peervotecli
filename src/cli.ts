@@ -128,6 +128,22 @@ async function requireProofServer(): Promise<boolean> {
   return false;
 }
 
+// Translate the SDK's raw failure text into something a voter can act on.
+function explainFailure(error: unknown): string | null {
+  const text = `${error instanceof Error ? error.message : error} ${(error as any)?.cause?.message ?? ''}`;
+  if (/Not enough Dust|could not balance dust|Insufficient Funds/i.test(text)) {
+    return 'The wallet ran out of DUST for fees. DUST regenerates from tNIGHT — check option 5, wait a minute, retry.';
+  }
+  if (/election is closed/i.test(text)) return 'The election was closed before this ballot landed.';
+  if (/Failed to connect to Proof Server|ECONNREFUSED 127\.0\.0\.1:6300/i.test(text)) {
+    return 'The proof server stopped responding. Restart it with: npm run proof-server:start';
+  }
+  if (/disconnected from|Normal Closure|SubmissionError/i.test(text)) {
+    return 'The network kept dropping the connection. Wait a minute and try again.';
+  }
+  return null;
+}
+
 async function readLedger(providers: Awaited<ReturnType<typeof createProviders>>, address: string) {
   const contractState = await providers.publicDataProvider.queryContractState(address);
   return contractState ? decodeLedger(contractState.data) : null;
@@ -335,6 +351,8 @@ async function main() {
           console.log('     itself never leaves private state — nobody can tell who voted.\n');
         } catch (error) {
           console.error('\n  ❌ Failed:', error instanceof Error ? error.message : error);
+          const hint = explainFailure(error);
+          if (hint) console.log(`  💡 ${hint}\n`);
           if (String(error).includes('already cast a ballot')) {
             console.log('  (this new secret collided with an existing id — near-impossible; try again)');
           }
