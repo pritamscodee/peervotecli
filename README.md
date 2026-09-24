@@ -51,10 +51,12 @@ Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed 
 |---|---|
 | Contract address | `fea4e520a2cb499a602aa944dd45412118e0de6a360264bee16ca61c1eb99054` |
 | Question | *"Should PearPass ship a private voting MVP?"* |
-| Web demo | [peervotecli.vercel.app](https://peervotecli.vercel.app) (static dashboard on Vercel) |
+| Web demo | [peervotecli.vercel.app/dashboard](https://peervotecli.vercel.app/dashboard) — live preprod tally + Lace voting |
+| Verify on-chain | Query the contract on the [preprod indexer](https://indexer.preprod.midnight.network/api/v4/graphql) (see [Verify the deployment](#-verify-the-deployment-yourself)) |
 
-> The hosted dashboard is just the frontend. Proofs and signing never happen on Vercel: voting
-> talks to your **local** API (`npm run api`, port 3001) and proof server, or to Lace in the browser.
+> **How the hosted demo works:** Vercel only serves static files. The dashboard reads the tally
+> straight from the public preprod indexer, fetches the circuit keys from its own origin, and
+> casts ballots through **Lace in your browser**. Your ballot secret never leaves the tab.
 > The CLI is still the primary way to use PeerVote.
 
 ---
