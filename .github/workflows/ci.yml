@@ -9,6 +9,11 @@ on:
 env:
   COMPACT_VERSION: "0.31.1"
 
+# A newer push to the same branch supersedes the older run (each e2e run boots a full devnet).
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   compile-test:
     name: Compile contract + unit tests
