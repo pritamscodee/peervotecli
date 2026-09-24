@@ -40,7 +40,12 @@ function loadLace(): Promise<typeof import('./lace-vote')> {
 // Backend API base URL (port 3001, CORS-enabled). Override with
 // window.PEARPASS_API_URL if the API runs elsewhere.
 const API_BASE = window.PEARPASS_API_URL || 'http://localhost:3001';
-const ZK_CONFIG_BASE = API_BASE + '/zkconfig/private-election';
+let zkConfigBase = API_BASE + '/zkconfig/private-election';
+
+// Hosted (Vercel) mode: no local API reachable. The dashboard then reads the tally straight from
+// the public indexer, serves ZK keys from its own origin, and votes through Lace in the browser.
+let standalone = false;
+let electionCfg: import('./lace-vote').PublicElectionConfig | null = null;
 
 // The busy overlay must never spin forever: if an operation has not settled
 // by the hard cap it is reported as failed so the UI (and the Connect button)
@@ -196,15 +201,22 @@ function wireVoteMode(): void {
   mode.addEventListener('click', (ev) => {
     const btn = (ev.target as HTMLElement).closest('[data-mode]') as HTMLButtonElement | null;
     if (!btn) return;
-    voteMode = (btn.dataset.mode === 'wallet' ? 'wallet' : 'backend') as 'backend' | 'wallet';
+    setVoteMode(btn.dataset.mode === 'wallet' ? 'wallet' : 'backend');
+    addLog('info', 'Voting mode: <strong>' + esc(modeLabel(voteMode)) + '</strong>.');
+  });
+}
+
+function setVoteMode(next: 'backend' | 'wallet'): void {
+  voteMode = next;
+  const mode = $('voteMode');
+  if (mode) {
     for (const opt of mode.querySelectorAll<HTMLButtonElement>('.vm-opt')) {
       const on = opt.dataset.mode === voteMode;
       opt.classList.toggle('is-active', on);
       opt.setAttribute('aria-pressed', String(on));
     }
-    syncVotingHint();
-    addLog('info', 'Voting mode: <strong>' + esc(modeLabel(voteMode)) + '</strong>.');
-  });
+  }
+  syncVotingHint();
 }
 
 // ---------- api ----------
@@ -219,17 +231,59 @@ async function api(path: string, options?: RequestInit): Promise<{ ok: boolean; 
 }
 
 async function refreshStatus(): Promise<void> {
+  if (!standalone) {
+    try {
+      const data = await api('/api/status');
+      if (data && data.ok) {
+        render(data);
+        setLive(true);
+        return;
+      }
+      setLive(false, data && data.error ? String(data.error) : 'offline');
+      return;
+    } catch {
+      // No local API — fall through to the hosted, indexer-only mode.
+    }
+    if (!(await enterStandalone())) {
+      setLive(false, 'API offline — start backend: npm run api');
+      return;
+    }
+  }
   try {
-    const data = await api('/api/status');
-    if (data && data.ok) {
+    const lace = await loadLace();
+    const data = await lace.readPublicStatus(electionCfg!);
+    if (data.ok) {
       render(data);
       setLive(true);
     } else {
-      setLive(false, data && data.error ? String(data.error) : 'offline');
+      setLive(false, String(data.error ?? 'no contract state'));
     }
-  } catch {
-    setLive(false, 'API offline — start backend: npm run api');
+  } catch (err) {
+    setLive(false, 'indexer unreachable');
+    addLog('bad', '❌ Could not read the election from the public indexer: ' + esc(errorMessage(err)));
   }
+}
+
+/** Switch to hosted mode if the site ships a public election config (web/public/election.json). */
+async function enterStandalone(): Promise<boolean> {
+  try {
+    const res = await fetch('/election.json', { cache: 'no-store' });
+    if (!res.ok) return false;
+    electionCfg = await res.json();
+  } catch {
+    return false;
+  }
+  if (!electionCfg?.contractAddress || !electionCfg.indexer) return false;
+  standalone = true;
+  zkConfigBase = window.location.origin + '/zkconfig/private-election';
+  setVoteMode('wallet');
+  startPolling();
+  addLog(
+    'info',
+    'Hosted demo: reading the <strong>' + esc(electionCfg.network) + '</strong> election straight from the public indexer. ' +
+      'To vote, connect <strong>Lace</strong> (set to ' + esc(networkName(electionCfg.network)) + ') — the proof is built in your browser.',
+  );
+  return true;
 }
 
 function setLive(ok: boolean, msg?: string): void {
@@ -531,7 +585,7 @@ async function castVoteWithWallet(choice: string): Promise<void> {
 
   if (!providers) {
     const built = await lace.buildBrowserProviders(session, {
-      zkConfigBaseURL: ZK_CONFIG_BASE,
+      zkConfigBaseURL: zkConfigBase,
       indexerFallback: String((state as { indexer?: string }).indexer ?? ''),
       indexerWsFallback: String((state as { indexerWS?: string }).indexerWS ?? ''),
       proofServerFallback: String((state as { proofServer?: string }).proofServer ?? ''),
@@ -560,6 +614,12 @@ async function castVoteWithWallet(choice: string): Promise<void> {
 async function castVote(choice: string): Promise<void> {
   if (busy || !state || (state as { state?: number }).state !== 0) return;
   const useWallet = voteMode === 'wallet' && !!session;
+
+  if (standalone && !useWallet) {
+    addLog('bad', '❌ The hosted demo has no backend. Click <strong>Connect Lace</strong> (Preprod) to vote from your browser.');
+    toast('Connect Lace to vote on the hosted demo.', true);
+    return;
+  }
 
   if (voteMode === 'wallet' && !session) {
     addLog(
@@ -625,6 +685,12 @@ async function castVote(choice: string): Promise<void> {
 
 async function closeElection(): Promise<void> {
   if (busy || !state || (state as { state?: number }).state !== 0) return;
+  if (standalone) {
+    addLog('info', 'Closing needs the election authority\'s admin secret, which never leaves the deployer\'s machine. ' +
+      'The authority closes it with <code>npm run cli</code> → option 4.');
+    toast('Only the election authority can close it (from the CLI).', true);
+    return;
+  }
   if (!window.confirm('Close this election? The authority cannot reopen it.')) return;
   startBusy('Closing the election…', 'backend');
   addLog('info', 'Closing the election (requires the authority admin secret — held by the backend)…');
@@ -669,7 +735,8 @@ async function checkBalance(): Promise<void> {
 
 function startPolling(): void {
   if (pollTimer) clearInterval(pollTimer);
-  pollTimer = window.setInterval(() => void refreshStatus(), 4000);
+  // The public indexer is shared — poll it gently in hosted mode.
+  pollTimer = window.setInterval(() => void refreshStatus(), standalone ? 15000 : 4000);
 }
 
 // ---------- boot ----------
