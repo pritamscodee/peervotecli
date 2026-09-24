@@ -191,6 +191,20 @@ async function main() {
   console.log(`  Contract: ${deployment.address}`);
   console.log(`  Network: ${network}\n`);
 
+  // Fail fast — before a potentially long wallet sync — if the recorded contract isn't on this chain
+  // (e.g. the local devnet was reset, or the state file points at another network's address).
+  try {
+    const onChain = await indexerPublicDataProvider(networkConfig.indexer, networkConfig.indexerWS)
+      .queryContractState(deployment.address);
+    if (!onChain) {
+      console.error(`  ❌ No contract found at ${deployment.address} on ${network}.`);
+      console.log(`     Redeploy with: npm run setup -- --network ${network}\n`);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.log(`  ⚠ Could not verify the contract on the indexer (${error instanceof Error ? error.message : error}); continuing.\n`);
+  }
+
   const walletCtx = await createWallet({ network, networkConfig, seed: SEED });
 
   // Ctrl+C: checkpoint sync progress so the next run doesn't resync from scratch.
