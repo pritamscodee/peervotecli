@@ -1,0 +1,20 @@
+src/cli.ts
+  s_b84b4242fbbb95::t_cc8fd3172c57e1 131-146
+  s_b84b4242fbbb95::t_7764aba1b313ec 354-355
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "0ac8b7df721b815e81db0630371861d2e21203f8",
+  "prompts": {},
+  "sessions": {
+    "s_b84b4242fbbb95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b5e8135-4a2d-4bf4-b214-cd5dd5443d3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
