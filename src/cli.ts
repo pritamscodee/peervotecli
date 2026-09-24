@@ -412,9 +412,14 @@ async function main() {
     }
   }
 
-  await persistWalletState(network, walletCtx);
-  await walletCtx.wallet.stop();
-  rl.close();
+  try {
+    await persistWalletState(network, walletCtx);
+    await walletCtx.wallet.stop();
+  } catch (error) {
+    console.error('  ⚠ Could not cleanly save wallet state on exit:', error instanceof Error ? error.message : error);
+  } finally {
+    rl.close();
+  }
 }
 
 main().catch((error) => {
