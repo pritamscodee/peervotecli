@@ -233,6 +233,37 @@ id and check it against the chain. The unit tests check that the mirror matches.
 
 ---
 
+## 🧾 Public state vs private witness
+
+Midnight splits a contract's data into two worlds. `contracts/private-election.compact` uses both on purpose.
+
+**Public ledger state** is stored on-chain and anyone can read it:
+
+| Ledger field | Type | Meaning |
+|---|---|---|
+| `question` | `Opaque<"string">` | The yes/no question, set once at deploy |
+| `state` | `ElectionState` (`OPEN` / `CLOSED`) | Whether ballots are still accepted |
+| `tallyFor`, `tallyAgainst` | `Counter` | Running totals |
+| `ballots` | `Set<Bytes<32>>` | Every disclosed ballot nullifier (used to block double votes) |
+| `authority` | `Bytes<32>` | Hash of the admin secret. Only this public key is stored. |
+
+**Private witnesses** are supplied by the caller's machine and used *inside* the ZK proof. They are never written to the chain:
+
+| Witness | Held in | Used by |
+|---|---|---|
+| `ballotSecret()` | The voter's private state (`midnight-level-db/`, or IndexedDB in the browser) | `castVote`, to derive the nullifier |
+| `adminSecret()` | The deployer's private state | `closeElection`, to prove it is the authority |
+
+**Where `disclose()` is used, and why:** Compact won't let witness-derived data reach the
+ledger unless you mark it with `disclose()`. PeerVote discloses exactly three things:
+
+1. `disclose(ballotId(secret))` publishes the **hash** of the secret (the nullifier), never the secret itself.
+2. `disclose(choice)` makes the FOR/AGAINST branch public, so the right counter can be incremented.
+3. `disclose(ballotQuestion)` / `disclose(authorityKey)` in the constructor publish the question and the admin secret's *hash*.
+
+The admin secret is compared inside the proof (`authority == authorityPublicKey(adminSecret())`)
+and never disclosed.
+
 ## 🛡️ Privacy model
 
 Everything on the ledger is public, so the design decides exactly what gets published.
