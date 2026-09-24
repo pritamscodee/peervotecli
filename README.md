@@ -42,6 +42,7 @@ Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed 
 
 > Idea from the Midnight idea list: **[Private Voting](PRODUCT_PROPOSAL.md)**
 
+
 **Live on preprod**
 
 | | |
@@ -54,6 +55,7 @@ Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed 
 ## 🚀 Quick start
 
 ### Requirements
+
 
 | Tool | Version | Why |
 |---|---|---|
