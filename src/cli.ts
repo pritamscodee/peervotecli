@@ -209,9 +209,14 @@ async function main() {
     switch (choice.trim()) {
       case '1': {
         console.log('\n  ── Public election state ──\n');
-        const state = await readLedger(providers, deployment.address);
-        console.log(describeLedger(state));
-        console.log('\n  ℹ  Everything above is publicly readable on-chain. The tally can\n     be audited: ballots.size() must equal tallyFor + tallyAgainst.\n');
+        try {
+          const state = await readLedger(providers, deployment.address);
+          console.log(describeLedger(state));
+          console.log('\n  ℹ  Everything above is publicly readable on-chain. The tally can\n     be audited: ballots.size() must equal tallyFor + tallyAgainst.\n');
+        } catch (error) {
+          console.error('  ❌ Could not read the election from the indexer:', error instanceof Error ? error.message : error);
+          console.log(`     Indexer: ${networkConfig.indexer} — try again in a moment.\n`);
+        }
         break;
       }
 
