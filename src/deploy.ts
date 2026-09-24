@@ -109,6 +109,15 @@ async function createProviders(walletCtx: WalletContext) {
 async function main() {
   const question =
     process.env.ELECTION_QUESTION?.trim() || 'Should PearPass ship a private voting MVP?';
+  // The question is written on-chain at deploy and can never be changed — reject bad input up front.
+  if (question.length > 280) {
+    console.error(`\n❌ ELECTION_QUESTION is ${question.length} characters; keep it to 280 or fewer.\n`);
+    process.exit(1);
+  }
+  if (/[\u0000-\u001f\u007f]/.test(question)) {
+    console.error('\n❌ ELECTION_QUESTION contains control characters (newlines, tabs, …). Use a single plain line.\n');
+    process.exit(1);
+  }
 
   console.log('\n╔══════════════════════════════════════════════════════════════╗');
   console.log(`║  Create private election on ${network}`);
