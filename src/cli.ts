@@ -294,4 +294,9 @@ async function main() {
   rl.close();
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  console.error('\n  ❌ PeerVote CLI crashed:', error instanceof Error ? error.message : error);
+  if (process.env.DEBUG) console.error(error);
+  else console.error('     (set DEBUG=1 for the full stack trace)');
+  process.exit(1);
+});
