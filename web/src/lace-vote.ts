@@ -26,7 +26,7 @@ import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client
 import { createProofProvider } from '@midnight-ntwrk/midnight-js-types';
 import { setNetworkId } from '@midnight-ntwrk/midnight-js-network-id';
 
-import { compiledContract } from './contract';
+import { compiledContract, decodeLedger } from './contract';
 import { newBallotSecret, ballotIdFromSecret, toHex, bytesEqual } from './keys';
 import { bytesToHex, hexToBytes, type WalletSession } from './wallet-bridge';
 
@@ -142,6 +142,50 @@ export async function buildBrowserProviders(session: WalletSession, opts: Browse
       walletProvider,
       midnightProvider,
     },
+  };
+}
+
+/** Public election info baked into the static site (web/public/election.json). */
+export interface PublicElectionConfig {
+  network: string;
+  contractAddress: string;
+  indexer: string;
+  indexerWS: string;
+  node: string;
+  proofServer: string;
+}
+
+/**
+ * Read the election straight from the public indexer — no backend, no wallet. Returns the same
+ * shape as the API's /api/status so the dashboard can render either source.
+ */
+export async function readPublicStatus(cfg: PublicElectionConfig): Promise<{ ok: boolean; [key: string]: unknown }> {
+  const publicData = indexerPublicDataProvider(cfg.indexer, cfg.indexerWS, WebSocket as never);
+  const contractState = await publicData.queryContractState(cfg.contractAddress);
+  if (!contractState) return { ok: false, error: `No contract at ${cfg.contractAddress.slice(0, 12)}… on ${cfg.network}` };
+  const ledger = decodeLedger(contractState.data);
+  const ballots = Number((ledger.ballots as unknown as { size(): bigint | number }).size());
+  const forV = Number(ledger.tallyFor);
+  const againstV = Number(ledger.tallyAgainst);
+  const state = Number(ledger.state);
+  return {
+    ok: true,
+    source: 'indexer',
+    network: cfg.network,
+    contractAddress: cfg.contractAddress,
+    question: ledger.question,
+    state,
+    stateLabel: state === 0 ? 'OPEN' : state === 1 ? 'CLOSED' : String(state),
+    for: forV,
+    against: againstV,
+    ballots,
+    authority: '0x' + toHex(ledger.authority),
+    auditOk: ballots === forV + againstV,
+    indexer: cfg.indexer,
+    indexerWS: cfg.indexerWS,
+    node: cfg.node,
+    proofServer: cfg.proofServer,
+    syncedAt: Date.now(),
   };
 }
 
