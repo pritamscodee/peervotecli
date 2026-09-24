@@ -275,11 +275,15 @@ async function main() {
       }
 
       case '5': {
-        const currentState = await walletCtx.wallet.waitForSyncedState();
-        const night = currentState.unshielded.balances[unshieldedToken().raw] ?? 0n;
-        const dust = currentState.dust.balance(new Date());
-        console.log(`\n  tNight: ${night.toLocaleString()}`);
-        console.log(`  DUST:   ${dust.toLocaleString()}\n`);
+        try {
+          const currentState = await walletCtx.wallet.waitForSyncedState();
+          const night = currentState.unshielded.balances[unshieldedToken().raw] ?? 0n;
+          const dust = currentState.dust.balance(new Date());
+          console.log(`\n  tNight: ${night.toLocaleString()}`);
+          console.log(`  DUST:   ${dust.toLocaleString()}\n`);
+        } catch (error) {
+          console.error('\n  ❌ Could not read wallet balance:', error instanceof Error ? error.message : error, '\n');
+        }
         break;
       }
 
