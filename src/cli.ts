@@ -265,6 +265,15 @@ async function main() {
       case '3': {
         const forVote = choice.trim() === '2';
         if (!(await requireProofServer())) break;
+        try {
+          const current = await readLedger(providers, deployment.address);
+          if (current && Number(current.state) !== 0) {
+            console.log('\n  ❌ This election is CLOSED — no more ballots can be cast.\n');
+            break;
+          }
+        } catch {
+          // Indexer hiccup: let the circuit itself enforce the OPEN check.
+        }
         console.log(`\n  Casting a ${forVote ? 'FOR' : 'AGAINST'} ballot as a new anonymous voter...`);
         console.log('  (this may take 30-60 seconds: proof generation + submission)\n');
 
