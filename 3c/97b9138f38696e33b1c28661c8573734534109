@@ -1,0 +1,125 @@
+package.json
+  s_b84b4242fbbb95::t_ed10ce4704fa27 1-78
+src/cli.ts
+  s_b84b4242fbbb95::t_6b25c49296809d 1-297
+web/src/lace-vote.ts
+  s_b26d188ec4f320::t_5ce6c610cf4821 1-201
+.github/workflows/ci.yml
+  s_b84b4242fbbb95::t_297f3638299530 1-94
+.gitignore
+  s_b84b4242fbbb95::t_0588107352c511 1-64
+PRODUCT_PROPOSAL.md
+  s_b84b4242fbbb95::t_ea2f3618c7d6e0 1-90
+README.md
+  s_b84b4242fbbb95::t_5a21f954150a67 1-315
+contracts/managed/private-election/compiler/contract-info.json
+  s_b84b4242fbbb95::t_96cf53fbad8d42 1-116
+contracts/managed/private-election/contract/index.d.ts
+  s_b84b4242fbbb95::t_2e84f9a504d1f9 1-58
+contracts/managed/private-election/contract/index.js
+  s_b84b4242fbbb95::t_85bd51da64040e 1-644
+contracts/managed/private-election/contract/index.js.map
+  s_b84b4242fbbb95::t_e0f90fdb645fcc 1-8
+contracts/managed/private-election/zkir/castVote.zkir
+  s_b84b4242fbbb95::t_4991d4e679efae 1-120
+contracts/managed/private-election/zkir/closeElection.zkir
+  s_b84b4242fbbb95::t_1a60a165824136 1-71
+contracts/private-election.compact
+  s_b84b4242fbbb95::t_b86b3274c16188 1-88
+docker-compose.yml
+  s_b84b4242fbbb95::t_f3a2dfcd2fe010 1-65
+package-lock.json
+  s_b84b4242fbbb95::t_0b2992e94c7743 1-4811
+scripts/audit-store.ts
+  s_b84b4242fbbb95::t_fdb36a168fba56 1-116
+scripts/clean.mjs
+  s_b84b4242fbbb95::t_ccfeaf7f4530b1 1-40
+scripts/db-init.ts
+  s_b84b4242fbbb95::t_dcdcff91d19319 1-22
+scripts/dev.mjs
+  s_b84b4242fbbb95::t_69328755d4f0ec 1-33
+scripts/e2e-check.ts
+  s_b84b4242fbbb95::t_96541ee3e13180 1-146
+scripts/private-election-demo.ts
+  s_b84b4242fbbb95::t_1cd6cb0db30041 1-264
+src/check-balance.ts
+  s_b84b4242fbbb95::t_502f0da3587663 1-87
+src/contract.ts
+  s_b84b4242fbbb95::t_eb214ac3bc96ee 1-36
+src/db.ts
+  s_b84b4242fbbb95::t_29b756b5043466 1-191
+src/deploy.ts
+  s_b84b4242fbbb95::t_73de41ff70a02b 1-353
+src/keys.ts
+  s_b84b4242fbbb95::t_e6c1ad64e86cc9 1-48
+src/network.ts
+  s_b84b4242fbbb95::t_2aaea4cfec411c 1-431
+src/server.ts
+  s_b84b4242fbbb95::t_a80e008f74d836 1-383
+src/setup.ts
+  s_b84b4242fbbb95::t_c60036c83927ff 1-39
+src/wallet-state.ts
+  s_b84b4242fbbb95::t_6034b202241bfb 1-95
+src/wallet.ts
+  s_b84b4242fbbb95::t_146261f1b33e5a 1-199
+src/web-server.ts
+  s_b84b4242fbbb95::t_7c6e9ce64527f4 1-66
+src/witnesses.ts
+  s_b84b4242fbbb95::t_909c528792105f 1-37
+tests/keys.test.ts
+  s_b84b4242fbbb95::t_0a250e5dfb7b66 1-66
+tsconfig.json
+  s_b84b4242fbbb95::t_76a84232533cea 1-20
+vite.config.ts
+  s_b84b4242fbbb95::t_9903c37eeb5b7e 1-73
+web/dashboard.html
+  s_b84b4242fbbb95::t_a52ae912ec497e 1-173
+web/index.html
+  s_b84b4242fbbb95::t_5dc16620f9257f 1-91
+web/public/app.js
+  s_b84b4242fbbb95::t_b7b5c597e57ccf 1-305
+web/src/contract.ts
+  s_b84b4242fbbb95::t_044aee83abf5b0 1-23
+web/src/dashboard.ts
+  s_b84b4242fbbb95::t_c5c3b5359660e4 1-717
+web/src/global.d.ts
+  s_b84b4242fbbb95::t_9433fa279d54ae 1-17
+web/src/keys.ts
+  s_b84b4242fbbb95::t_e7507f50c04a1d 1-43
+web/src/lib/crypto-shim.ts
+  s_b84b4242fbbb95::t_0866f59e5d8078 1-100
+web/src/polyfills.ts
+  s_b84b4242fbbb95::t_26204623b2fdb8 1-12
+web/src/wallet-bridge.ts
+  s_b84b4242fbbb95::t_a9ee60ebbead70 1-121
+web/src/witnesses.ts
+  s_b84b4242fbbb95::t_4bb69722ac0ca7 1-35
+web/styles.css
+  s_b84b4242fbbb95::t_e3ed74f173aff0 1-729
+web/tsconfig.json
+  s_b84b4242fbbb95::t_86165804531e7e 1-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "3c97b9138f38696e33b1c28661c8573734534109",
+  "prompts": {},
+  "sessions": {
+    "s_b26d188ec4f320": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0f2a220f-69a9-4b72-9ba6-3a207b7d6ba6",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    },
+    "s_b84b4242fbbb95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b5e8135-4a2d-4bf4-b214-cd5dd5443d3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
