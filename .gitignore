@@ -67,3 +67,6 @@ midnight-level-db/
 .vercel
 
 .vercel
+
+# ZK artifacts copied into the static site at build time (source of truth: contracts/managed)
+web/public/zkconfig/

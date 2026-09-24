@@ -22,11 +22,12 @@
     "db:init": "tsx scripts/db-init.ts",
     "audit:store": "tsx scripts/audit-store.ts",
     "web": "vite --config vite.config.ts",
-    "web:build": "vite build --config vite.config.ts",
+    "web:build": "node scripts/copy-zk-artifacts.mjs && vite build --config vite.config.ts",
     "web:preview": "vite preview --config vite.config.ts",
     "web:static": "tsx src/web-server.ts",
     "api": "tsx src/server.ts",
-    "dev": "node scripts/dev.mjs"
+    "dev": "node scripts/dev.mjs",
+    "web:zk": "node scripts/copy-zk-artifacts.mjs"
   },
   "dependencies": {
     "@midnight-ntwrk/compact-runtime": "0.16.0",
