@@ -15,7 +15,7 @@
 Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed nullifier.
 **Votes stay secret. The tally stays auditable.**
 
-[![CI](https://github.com/YOUR_GITHUB_USERNAME/pearpass/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_GITHUB_USERNAME/pearpass/actions/workflows/ci.yml)
+[![CI](https://github.com/pritamscodee/peervotecli/actions/workflows/ci.yml/badge.svg)](https://github.com/pritamscodee/peervotecli/actions/workflows/ci.yml)
 ![Midnight](https://img.shields.io/badge/network-Midnight%20preprod-6f42c1)
 ![Compact](https://img.shields.io/badge/contract-Compact%20%E2%89%A5%200.23-blue)
 ![Node](https://img.shields.io/badge/node-%E2%89%A5%2022-339933)
@@ -305,7 +305,7 @@ These are all git-ignored. **Back them up and don't share them.**
 - [x] Complete README with privacy model
 - [x] Working dApp on Midnight: Compact contract + CLI, **deployed to preprod**
 - [x] ≥ 3 passing tests: **9 unit tests** + e2e + lifecycle demo
-- [x] CI/CD workflow (swap `YOUR_GITHUB_USERNAME` in the badge after pushing)
+- [x] CI/CD workflow — badge live at pritamscodee/peervotecli
 - [x] Idea from the approved list: [Private Voting](PRODUCT_PROPOSAL.md)
 - [ ] 1-minute demo video: `npm run cli` → `1` → vote ×3 → `1` → `4` → `1`
 - [ ] X profile link
