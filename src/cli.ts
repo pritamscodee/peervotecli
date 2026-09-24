@@ -319,6 +319,10 @@ async function main() {
           });
           const tx = await withSubmitRetry('Ballot', () => voter.callTx.castVote(forVote));
           const ballotId = circuitOutputToBytes(tx);
+          if (ballotId.length !== 32) {
+            console.log(`\n  ⚠ The transaction succeeded but returned an unexpected ballot id (${ballotId.length} bytes).`);
+            console.log('    The vote is counted; check option 1 to confirm the tally.');
+          }
           const matched = Buffer.from(ballotId).equals(Buffer.from(expectedId));
           console.log(`\n  ✅ Ballot CAST (${forVote ? 'for' : 'against'})`);
           console.log(`  Transaction ID:  ${tx.public.txId}`);
