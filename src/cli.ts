@@ -379,6 +379,8 @@ async function main() {
           console.log(`  Block height:    ${tx.public.blockHeight}\n`);
         } catch (error) {
           console.error('\n  ❌ Failed:', error instanceof Error ? error.message : error);
+          const hint = explainFailure(error);
+          if (hint) console.log(`  💡 ${hint}\n`);
           if (String(error).includes('not the election authority')) {
             console.log('  This terminal is not the authority — the admin secret lives in the');
             console.log('  private state created at deploy time.\n');
