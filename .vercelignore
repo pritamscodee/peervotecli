@@ -1,0 +1,15 @@
+# Vercel only needs what `npm run web:build` reads. Never upload wallet secrets or local state:
+# the CLI uploads the working directory as deployment source otherwise.
+.env
+.env.*
+.midnight-state.json
+.midnight-state.json.*
+.midnight-wallet-state/
+midnight-level-db/
+*.log
+*.seed
+node_modules/
+web/dist/
+web/public/zkconfig/
+.vercel/
+.git/
