@@ -19,7 +19,7 @@ import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-p
 import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { NodeZkConfigProvider } from '@midnight-ntwrk/midnight-js-node-zk-config-provider';
 import { resolveNetwork, getOrCreateWallet, formatWalletBackupNotice, getDeployment } from './network';
-import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet';
+import { createWallet, persistWalletState, unshieldedToken, watchSyncStall, type WalletContext } from './wallet';
 import { compiledContract, decodeLedger, zkConfigPath } from './contract';
 import { newBallotSecret, ballotIdFromSecret, toHex } from './keys';
 
@@ -260,9 +260,13 @@ async function main() {
   const checkpointInterval = setInterval(() => {
     persistWalletState(network, walletCtx).catch(() => {});
   }, 60_000);
+  const stopStallWatch = watchSyncStall(walletCtx, (sec) => {
+    console.log(`\n  ⚠ Wallet sync hasn't moved for ${sec}s — it may be stalled. Ctrl+C and rerun to resume.`);
+  });
   await walletCtx.wallet.waitForSyncedState();
   clearInterval(syncInterval);
   clearInterval(checkpointInterval);
+  stopStallWatch();
   process.stdout.write('\r  ✓ Synced with network.                                      \n');
 
   await persistWalletState(network, walletCtx);
