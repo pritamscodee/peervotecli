@@ -111,6 +111,23 @@ async function withSubmitRetry(label: string, fn: () => Promise<any>): Promise<a
   }
 }
 
+// Any HTTP answer means the proof server is up; only connection-level failures mean it's down.
+async function isProofServerUp(): Promise<boolean> {
+  try {
+    await fetch(networkConfig.proofServer, { method: 'GET', signal: AbortSignal.timeout(3000) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function requireProofServer(): Promise<boolean> {
+  if (await isProofServerUp()) return true;
+  console.error(`\n  ❌ Proof server not reachable at ${networkConfig.proofServer}.`);
+  console.log('     Start it with: npm run proof-server:start\n');
+  return false;
+}
+
 async function readLedger(providers: Awaited<ReturnType<typeof createProviders>>, address: string) {
   const contractState = await providers.publicDataProvider.queryContractState(address);
   return contractState ? decodeLedger(contractState.data) : null;
@@ -247,6 +264,7 @@ async function main() {
       case '2':
       case '3': {
         const forVote = choice.trim() === '2';
+        if (!(await requireProofServer())) break;
         console.log(`\n  Casting a ${forVote ? 'FOR' : 'AGAINST'} ballot as a new anonymous voter...`);
         console.log('  (this may take 30-60 seconds: proof generation + submission)\n');
 
@@ -282,6 +300,7 @@ async function main() {
       }
 
       case '4': {
+        if (!(await requireProofServer())) break;
         console.log('\n  Closing the election (requires the authority admin secret)...');
         try {
           const tx = await withSubmitRetry('Close', () => admin.callTx.closeElection());
