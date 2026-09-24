@@ -163,6 +163,8 @@ async function main() {
   printBanner();
 
   const rl = createInterface({ input: stdin, output: stdout });
+  // readline swallows ^C at the prompt; route it to the process-level save-and-exit handler.
+  rl.on('SIGINT', () => process.emit('SIGINT'));
 
   const deployment = getDeployment(network);
   if (!deployment) {
@@ -220,7 +222,13 @@ async function main() {
     console.log('  5. Check wallet balance');
     console.log('  0. Exit\n');
 
-    const choice = await rl.question('  Your choice: ');
+    let choice: string;
+    try {
+      choice = await rl.question('  Your choice: ');
+    } catch {
+      // stdin closed (EOF / piped input ran out): leave the loop and save state.
+      choice = '0';
+    }
 
     switch (choice.trim()) {
       case '1': {
