@@ -169,6 +169,40 @@ export async function createWallet(opts: CreateWalletOptions): Promise<WalletCon
 }
 
 /**
+ * Watch the DUST child sync (the slowest one on public networks) and call `onStall` once if its
+ * applied index stops moving for `stallMs`. The SDK's sync stream can hang after an indexer
+ * disconnect without surfacing an error; restarting resumes from the last checkpoint.
+ * Returns a function that stops the watch.
+ */
+export function watchSyncStall(
+  ctx: WalletContext,
+  onStall: (stalledForSec: number) => void,
+  stallMs = 180_000,
+): () => void {
+  let last: bigint | undefined;
+  let lastChange = Date.now();
+  let warned = false;
+  const sub = (ctx.wallet as any).dust.state.subscribe((s: any) => {
+    const idx = s?.state?.progress?.appliedIndex;
+    if (typeof idx === 'bigint' && idx !== last) {
+      last = idx;
+      lastChange = Date.now();
+      warned = false;
+    }
+  });
+  const timer = setInterval(() => {
+    if (!warned && Date.now() - lastChange > stallMs) {
+      warned = true;
+      onStall(Math.round((Date.now() - lastChange) / 1000));
+    }
+  }, 15_000);
+  return () => {
+    sub.unsubscribe();
+    clearInterval(timer);
+  };
+}
+
+/**
  * Serialize each child wallet's current state and persist it for the next run.
  * Safe to call multiple times. Logs but does not throw on individual failures —
  * losing one child's state means the next run re-syncs that child only.

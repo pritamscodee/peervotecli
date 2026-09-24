@@ -11,7 +11,7 @@
  * Non-interactive: scaffold → npm run setup runs straight through.
  */
 import { resolveNetwork, getOrCreateWallet, formatWalletBackupNotice, recordDeployment } from './network';
-import { createWallet, persistWalletState, unshieldedToken, type WalletContext } from './wallet';
+import { createWallet, persistWalletState, unshieldedToken, watchSyncStall, type WalletContext } from './wallet';
 import { compiledContract, zkConfigPath } from './contract';
 import { newAdminSecret, authorityPublicKey } from './keys';
 import { isAuditStoreEnabled, initAuditStore, recordElection } from './db';
@@ -140,10 +140,15 @@ async function main() {
   const checkpointInterval = setInterval(() => {
     persistWalletState(network, walletCtx).catch(() => {});
   }, 60_000);
+  const stopStallWatch = watchSyncStall(walletCtx, (sec) => {
+    console.log(`\n  ⚠ DUST sync hasn't moved for ${sec}s — it may be stalled after an indexer disconnect.`);
+    console.log('    Press Ctrl+C and rerun: progress resumes from the last checkpoint.');
+  });
   const state = await walletCtx.wallet.waitForSyncedState();
   clearInterval(syncInterval);
   clearInterval(checkpointInterval);
   dustSub.unsubscribe();
+  stopStallWatch();
   process.stdout.write('\r  ✓ Synced with network.                                      \n');
 
   await persistWalletState(network, walletCtx);
