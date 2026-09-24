@@ -226,7 +226,15 @@ async function main() {
   const providers = await createProviders(walletCtx);
 
   // Connect as the election authority (restores the admin secret from deploy).
-  const admin = await connect(providers, deployment.address, { privateStateId: ADMIN_PRIVATE_STATE_ID });
+  let admin: any;
+  try {
+    admin = await connect(providers, deployment.address, { privateStateId: ADMIN_PRIVATE_STATE_ID });
+  } catch (error) {
+    console.error('\n  ❌ Could not connect as the election authority:', error instanceof Error ? error.message : error);
+    console.log('     Likely causes: midnight-level-db/ was deleted or moved, PRIVATE_STATE_PASSWORD changed');
+    console.log('     since deploy, or the indexer is unreachable. Voting needs a working connection too.\n');
+    throw error;
+  }
   console.log('  ✅ Connected as election authority.\n');
 
   let running = true;
