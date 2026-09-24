@@ -310,6 +310,15 @@ async function main() {
 
       case '4': {
         if (!(await requireProofServer())) break;
+        try {
+          const current = await readLedger(providers, deployment.address);
+          if (current && Number(current.state) !== 0) {
+            console.log('\n  ℹ  The election is already CLOSED — nothing to do.\n');
+            break;
+          }
+        } catch {
+          // Indexer hiccup: fall through; the circuit rejects a double close anyway.
+        }
         console.log('\n  Closing the election (requires the authority admin secret)...');
         try {
           const tx = await withSubmitRetry('Close', () => admin.callTx.closeElection());
