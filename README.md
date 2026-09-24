@@ -138,6 +138,7 @@ npm run cli
   5. Check wallet balance
   0. Exit
 ```
+<img width="1882" height="788" alt="icd ci" src="https://github.com/user-attachments/assets/30df87c5-3b70-4d2e-914c-2dfa9dc4d267" />
 
 | Key | Action | Cost | Notes |
 |---|---|---|---|
