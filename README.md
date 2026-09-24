@@ -439,16 +439,57 @@ These are all git-ignored. **Back them up and don't share them.**
 
 ---
 
-## ✅ Submission checklist (Midnight build challenge — Level 2)
+## ✅ Midnight build challenge: requirements map
 
-- [x] Complete README with privacy model
-- [x] Working dApp on Midnight: Compact contract + CLI, **deployed to preprod**
-- [x] ≥ 3 passing tests: **9 unit tests** + e2e + lifecycle demo
-- [x] CI/CD workflow — badge live at pritamscodee/peervotecli
-- [x] Idea from the approved list: [Private Voting](PRODUCT_PROPOSAL.md)
-- [x] Live demo: [peervotecli.vercel.app](https://peervotecli.vercel.app)
-- [x] Demo video: [YouTube](https://www.youtube.com/watch?v=lIwQ5XV-n00)
-- [ ] X profile link
+**Links:** repo [pritamscodee/peervotecli](https://github.com/pritamscodee/peervotecli) ·
+live demo [peervotecli.vercel.app](https://peervotecli.vercel.app/dashboard) ·
+video [YouTube](https://www.youtube.com/watch?v=lIwQ5XV-n00) ·
+preprod contract `fea4e520a2cb499a602aa944dd45412118e0de6a360264bee16ca61c1eb99054` ·
+X profile *(add link)*
+
+### Level 1: toolchain, contract, first deploy
+
+| Requirement | Evidence |
+|---|---|
+| Toolchain + contract compiles with `compact compile` | `npm run compile`, run on every push in [CI](.github/workflows/ci.yml) · [screenshot](docs/screenshots/compile.svg) |
+| Passing test suite | `npm test` (9 passing) · [screenshot](docs/screenshots/tests.svg) |
+| Generated `managed/` (circuits + keys) committed | [`contracts/managed/private-election/`](contracts/managed/private-election) (`keys/`, `zkir/`) |
+| Deployed to Preview/Preprod with visible address | Preprod `fea4e520…9054` · [screenshot](docs/screenshots/deploy.svg) |
+| Initial product idea paragraph | [Product idea](#-product-idea) |
+| Setup instructions | [Quick start](#-quick-start) |
+| Public state vs private witness | [Public state vs private witness](#-public-state-vs-private-witness) |
+
+### Level 2: frontend + Lace on Preprod
+
+| Requirement | Evidence |
+|---|---|
+| Lace connect / disconnect | Dashboard **Connect Lace** / **Disconnect** (`web/src/dashboard.ts`, `web/src/wallet-bridge.ts`) |
+| Circuit called from the frontend | `castVote` via `findDeployedContract` in the browser (`web/src/lace-vote.ts`) |
+| Observable privacy behavior | [Predicted vs disclosed nullifier](#-the-privacy-claim-and-how-to-watch-it-happen) |
+| Preprod contract, verifiable | [Verify the deployment yourself](#-verify-the-deployment-yourself) |
+| Live demo link | [peervotecli.vercel.app/dashboard](https://peervotecli.vercel.app/dashboard) |
+| README documents the privacy claim | [Privacy model](#-privacy-model) |
+
+### Level 3: product-grade privacy dApp
+
+| Requirement | Evidence |
+|---|---|
+| Idea from the list | **Private Voting**: [PRODUCT_PROPOSAL.md](PRODUCT_PROPOSAL.md) |
+| Uses Midnight's privacy model meaningfully | ZK ballots with nullifiers and an authority proof: [How the ZK works](#-how-the-zero-knowledge-part-works) |
+| ≥ 3 tests passing | 9 unit tests, plus an e2e check and a lifecycle demo on a devnet in CI |
+| CI/CD with passing runs | [![CI](https://github.com/pritamscodee/peervotecli/actions/workflows/ci.yml/badge.svg)](https://github.com/pritamscodee/peervotecli/actions/workflows/ci.yml) |
+| "Privacy model" section: what an observer can and cannot learn | [Privacy model](#-privacy-model) |
+
+### Level 4: MVP launch
+
+| Requirement | Evidence |
+|---|---|
+| Working MVP live on Preprod | CLI + hosted dashboard against the preprod contract above |
+| Documentation (README + setup + usage) | This README: [Quick start](#-quick-start), [Using the CLI](#-using-the-cli), [Web + Lace](#-web-dashboard--lace-wallet) |
+| CI/CD on the product repo | [Actions](https://github.com/pritamscodee/peervotecli/actions) |
+| Product X profile linked | *(add link)* |
+| Demo video of the MVP | [YouTube](https://www.youtube.com/watch?v=lIwQ5XV-n00) |
+| Meaningful commits (≥ 15) | [commit history](https://github.com/pritamscodee/peervotecli/commits/main) |
 
 ## License
 
