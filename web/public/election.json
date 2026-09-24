@@ -1,0 +1,8 @@
+{
+  "network": "preprod",
+  "contractAddress": "fea4e520a2cb499a602aa944dd45412118e0de6a360264bee16ca61c1eb99054",
+  "indexer": "https://indexer.preprod.midnight.network/api/v4/graphql",
+  "indexerWS": "wss://indexer.preprod.midnight.network/api/v4/graphql/ws",
+  "node": "https://rpc.preprod.midnight.network",
+  "proofServer": "http://127.0.0.1:6300"
+}
