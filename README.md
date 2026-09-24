@@ -194,6 +194,28 @@ npm run clean             # ⚠️ DELETES .midnight-state.json (wallet seed!), 
 
 ---
 
+## 🌐 Web dashboard + Lace wallet
+
+Open **[peervotecli.vercel.app/dashboard](https://peervotecli.vercel.app/dashboard)**, or run it locally with `npm run dev` (port 3000).
+
+1. **Install Lace** with Midnight support, and in Lace → Settings → Network choose **Preprod**. Fund it from the [faucet](https://midnight-tmnight-preprod.nethermind.dev) so it has DUST for fees.
+2. **Connect:** click **Connect Lace** and approve the popup. The panel shows your address, network, tNIGHT and DUST. The dashboard uses the DApp Connector API v4 (`connect("preprod")`).
+3. **Vote:** click **FOR** or **AGAINST**. In your browser tab, the dashboard:
+   - creates a fresh ballot secret and predicts its nullifier,
+   - calls the `castVote` circuit with `findDeployedContract`,
+   - asks Lace to prove, balance, sign and submit.
+4. **Watch the privacy claim:** the log prints the predicted and disclosed ballot ids and whether they match.
+5. **Disconnect:** click **Disconnect**. The session and providers are cleared.
+
+| Where it runs | Tally from | Votes via |
+|---|---|---|
+| Hosted (Vercel) | Public preprod indexer, read in the browser | Lace (in-browser proof) |
+| Local (`npm run dev`) | Local API → indexer | Backend proof server, or Lace |
+
+Closing the election is authority-only and stays in the CLI, because the admin secret never leaves the deployer's machine.
+
+---
+
 ## 🧠 How the zero-knowledge part works
 
 ```
