@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PearPass Dashboard — Private on-chain election</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%238b5cf6'/%3E%3Cpath d='M16 6c5.5 0 10 4.5 10 10 0 .9-.1 1.8-.3 2.6L14 13l4 12c4.8-.4 8.6-4.4 8.6-9.4 0-5.8-4.8-10.6-10.6-10.6S5.6 9.8 5.6 15.6c0 5 3.8 9 8.6 9.4L18 13l-11.7 5.6C6 17.8 6 16.9 6 16c0-5.5 4.5-10 10-10z' fill='white'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-grid"></div>
+
+    <header class="nav">
+      <a class="brand" href="/">
+        <span class="brand-mark">◭</span>
+        <span>PearPass</span>
+      </a>
+      <div class="nav-right">
+        <span class="chip" id="networkChip">network…</span>
+        <span class="chip chip-muted" id="contractChip" title="Contract address">contract…</span>
+        <span class="chip" id="liveChip">connecting…</span>
+      </div>
+    </header>
+
+    <main class="dash">
+      <section class="card card-q">
+        <div class="card-head">
+          <span class="section-label">Election</span>
+          <span class="pill" id="statePill">…</span>
+        </div>
+        <h2 class="question" id="question">Loading election…</h2>
+        <div class="meta-row">
+          <span>
+            <span class="meta-label">Authority</span>
+            <code id="authority">…</code>
+          </span>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="card-head">
+          <span class="section-label">Public tally</span>
+          <span class="muted" id="totalBallots">0 ballots</span>
+        </div>
+
+        <div class="tally-row">
+          <div class="tally-block">
+            <div class="tally-top">
+              <span class="tally-name for">For</span>
+              <strong class="tally-num" id="forNum">—</strong>
+            </div>
+            <div class="bar"><div class="bar-fill for" id="forBar" style="width:0%"></div></div>
+          </div>
+          <div class="tally-block">
+            <div class="tally-top">
+              <span class="tally-name against">Against</span>
+              <strong class="tally-num" id="againstNum">—</strong>
+            </div>
+            <div class="bar"><div class="bar-fill against" id="againstBar" style="width:0%"></div></div>
+          </div>
+        </div>
+
+        <div class="audit" id="audit">
+          <span class="audit-icon">⏳</span>
+          <span>Checking tally invariant…</span>
+        </div>
+      </section>
+
+      <section class="card card-wallet col-5">
+        <div class="card-head">
+          <span class="section-label">Wallet (Lace)</span>
+          <span class="muted" id="walletStatus">not connected</span>
+        </div>
+
+        <div class="wallet-connect-row">
+          <select id="walletPick" class="wallet-pick" hidden></select>
+          <button class="btn btn-primary btn-sm" id="walletConnect">Connect Lace</button>
+        </div>
+
+        <div class="wallet-grid" id="walletDetails" hidden>
+          <div>
+            <span class="meta-label">Address</span>
+            <code id="walletAddr">—</code>
+          </div>
+          <div>
+            <span class="meta-label">Network</span>
+            <strong id="walletNetwork">—</strong>
+          </div>
+          <div>
+            <span class="meta-label">tNIGHT</span>
+            <strong id="walletNight">—</strong>
+          </div>
+          <div>
+            <span class="meta-label">DUST</span>
+            <strong id="walletDust">—</strong>
+          </div>
+          <div>
+            <span class="meta-label">Indexer</span>
+            <code id="walletIndexer">—</code>
+          </div>
+          <div>
+            <span class="meta-label">Proving</span>
+            <code id="walletProof">—</code>
+          </div>
+        </div>
+
+        <p class="muted wallet-note" id="walletNote">Connect the Midnight Lace wallet to cast ballots as an in-browser circuit call. Without it, voting falls back to the backend proof server.</p>
+      </section>
+
+      <section class="card col-5">
+        <div class="card-head">
+          <span class="section-label">Cast a ballot</span>
+          <span class="muted" id="votingHint">anonymous (backend proof server)</span>
+        </div>
+
+        <div class="vote-mode" id="voteMode" role="radiogroup" aria-label="Voting mode">
+          <button type="button" class="vm-opt is-active" data-mode="backend" aria-pressed="true">Backend (recommended)</button>
+          <button type="button" class="vm-opt" data-mode="wallet" aria-pressed="false">Via Lace (in-browser)</button>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-for btn-lg" id="voteFor">Vote FOR</button>
+          <button class="btn btn-against btn-lg" id="voteAgainst">Vote AGAINST</button>
+        </div>
+
+        <div class="busy" id="busy" hidden>
+          <div class="spinner"></div>
+          <div>
+            <strong id="busyTitle">Generating zero-knowledge proof…</strong>
+            <p class="muted" id="busySub">Proof generation takes ~20s via the backend proof server, or 30–60s in-browser. This is the <em>mute</em> part — your identity stays hidden.</p>
+          </div>
+        </div>
+
+        <button class="btn btn-danger" id="closeBtn" title="Authority only">Close election</button>
+      </section>
+
+      <section class="card col-7">
+        <div class="card-head">
+          <span class="section-label">Activity</span>
+          <button class="btn btn-ghost btn-sm" id="refreshBtn">↻ refresh</button>
+        </div>
+        <ul class="log" id="log"></ul>
+      </section>
+
+      <section class="card card-balance col-5">
+        <div class="card-head">
+          <span class="section-label">Authority wallet</span>
+          <button class="btn btn-ghost btn-sm" id="balanceBtn">check</button>
+        </div>
+        <div class="balance-grid">
+          <div>
+            <span class="meta-label">Address</span>
+            <code id="balanceAddr">—</code>
+          </div>
+          <div class="balance-nums">
+            <span><span class="meta-label">tNIGHT</span> <strong id="nightBal">—</strong></span>
+            <span><span class="meta-label">DUST</span> <strong id="dustBal">—</strong></span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" hidden></div>
+
+    <footer class="foot">PearPass · local Midnight devnet — for demonstration only</footer>
+
+    <script>
+      // Backend API lives on port 3001; frontend serves on port 3000.
+      window.PEARPASS_API_URL = 'http://localhost:3001';
+    </script>
+    <script type="module" src="./src/dashboard.ts"></script>
+  </body>
+</html>

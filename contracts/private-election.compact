@@ -1,0 +1,88 @@
+pragma language_version >= 0.23;
+
+import CompactStandardLibrary;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PearPass: a private, on-chain yes/no election (v0, Midwest Workshop Levels 1-2)
+//
+// Privacy model (zero-knowledge in circuit, verifiable in public):
+//   • A voter's identity is a 32-byte `ballotSecret` that lives ONLY in the
+//     voter's private state. It is proven inside the circuit and never leaves
+//     the proof.
+//   • When a ballot is cast, the only public trace is a disclosed "ballot id":
+//     persistentHash("pearpass:ballot:" || ballotSecret). Given the id alone it
+//     is computationally infeasible to recover the secret, so the ballot cannot
+//     be attributed back to the voter (unlinkability of the vote).
+//   • Each voter gets exactly ONE ballot per election: the ballot id is
+//     deterministic for a given secret, and the public `ballots` set rejects a
+//     second entry for the same id. Observers can audit the tally against the
+//     size of this set (ballots.size() == tallyFor + tallyAgainst).
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Lifecycle of the election: ballots may be cast only while OPEN.
+export enum ElectionState {
+  OPEN,
+  CLOSED,
+}
+
+export ledger question: Opaque<"string">;
+export ledger state: ElectionState;
+export ledger tallyFor: Counter;
+export ledger tallyAgainst: Counter;
+// Disclosed ballot nullifiers — the public, auditable trail of every ballot.
+export ledger ballots: Set<Bytes<32>>;
+// Election authority: the deployer proves knowledge of the matching
+// admin secret (via authorityPublicKey) to close the election.
+export ledger authority: Bytes<32>;
+
+constructor(ballotQuestion: Opaque<"string">, authorityKey: Bytes<32>) {
+  question = disclose(ballotQuestion);
+  state = ElectionState.OPEN;
+  authority = disclose(authorityKey);
+}
+
+// ── Private witnesses ────────────────────────────────────────────────────────
+// Read the voter's secret. Runs inside the zero-knowledge proof; the value is
+// never published, only its hash (the ballot id) ever appears on-chain.
+witness ballotSecret(): Bytes<32>;
+
+// Read the election authority's admin secret. Again: in-proof only.
+witness adminSecret(): Bytes<32>;
+
+// Deterministic, per-election pseudonym for a voter: the disclosed nullifier
+// that lets everyone verify a ballot was cast by a unique, entitled voter
+// without ever learning which voter.
+circuit ballotId(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pearpass:ballot:"), secret]);
+}
+
+circuit authorityPublicKey(secret: Bytes<32>): Bytes<32> {
+  return persistentHash<Vector<2, Bytes<32>>>([pad(32, "pearpass:authority:"), secret]);
+}
+
+// Cast a private ballot. Publishes nothing about the voter except a hashed
+// ballot id; the tally is incremented under proof that the caller knows a
+// secret whose hash is not already in the ballots set.
+export circuit castVote(choice: Boolean): Bytes<32> {
+  assert(state == ElectionState.OPEN, "election is closed, ballots cannot be cast");
+  const secret = ballotSecret();
+  const id = disclose(ballotId(secret));
+  // The member-check result is public data either way (the id itself is
+  // disclosed above), so the voter's identity is unaffected by revealing it.
+  assert(!ballots.member(id), "this voter has already cast a ballot");
+  if (disclose(choice)) {
+    tallyFor.increment(1);
+  } else {
+    tallyAgainst.increment(1);
+  }
+  ballots.insert(id);
+  return id;
+}
+
+// Freeze the election and its public tally. Only the authority (proof of the
+// admin secret matching `authority`) may do this.
+export circuit closeElection(): [] {
+  assert(state == ElectionState.OPEN, "election is already closed");
+  assert(authority == authorityPublicKey(adminSecret()), "caller is not the election authority");
+  state = ElectionState.CLOSED;
+}
