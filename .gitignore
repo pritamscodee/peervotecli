@@ -62,3 +62,8 @@ temp/
 
 # level-js private-state DB (created at runtime next to the project)
 midnight-level-db/
+
+# Vercel project link
+.vercel
+
+.vercel
