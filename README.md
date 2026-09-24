@@ -233,6 +233,26 @@ id and check it against the chain. The unit tests check that the mirror matches.
 
 ---
 
+## 🔎 Verify the deployment yourself
+
+The preprod contract address is `fea4e520a2cb499a602aa944dd45412118e0de6a360264bee16ca61c1eb99054`.
+Ask the public preprod indexer for its latest on-chain action. You don't need a wallet or this repo:
+
+```bash
+curl -s https://indexer.preprod.midnight.network/api/v4/graphql \
+  -H 'content-type: application/json' \
+  -d '{"query":"{ contractAction(address: \"fea4e520a2cb499a602aa944dd45412118e0de6a360264bee16ca61c1eb99054\") { __typename address transaction { hash block { height timestamp } } } }"}'
+```
+
+```json
+{"data":{"contractAction":{"__typename":"ContractCall","address":"fea4e520…9054",
+  "transaction":{"hash":"8cc52177…84c1","block":{"height":2692104,…}}}}}
+```
+
+`ContractCall` means ballots have been cast against the deployed contract. To read the decoded
+tally (question, FOR, AGAINST, ballots), run `npm run cli` → `1`, or open the
+[hosted dashboard](https://peervotecli.vercel.app/dashboard).
+
 ## 🧾 Public state vs private witness
 
 Midnight splits a contract's data into two worlds. `contracts/private-election.compact` uses both on purpose.
