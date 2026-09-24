@@ -9,7 +9,9 @@
 ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝   ╚═════╝    ╚═╝   ╚══════╝
                              C  L  I
 ```
-Demo on youtube : https://www.youtube.com/watch?v=lIwQ5XV-n00
+
+**🌐 Live demo: [peervotecli.vercel.app](https://peervotecli.vercel.app)** · **▶️ Video: [YouTube](https://www.youtube.com/watch?v=lIwQ5XV-n00)**
+
 ### Anonymous, zero-knowledge yes/no voting — from your terminal, on Midnight.
 
 Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed nullifier.
@@ -49,6 +51,11 @@ Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed 
 |---|---|
 | Contract address | `fea4e520a2cb499a602aa944dd45412118e0de6a360264bee16ca61c1eb99054` |
 | Question | *"Should PearPass ship a private voting MVP?"* |
+| Web demo | [peervotecli.vercel.app](https://peervotecli.vercel.app) (static dashboard on Vercel) |
+
+> The hosted dashboard is just the frontend. Proofs and signing never happen on Vercel: voting
+> talks to your **local** API (`npm run api`, port 3001) and proof server, or to Lace in the browser.
+> The CLI is still the primary way to use PeerVote.
 
 ---
 
@@ -310,7 +317,8 @@ These are all git-ignored. **Back them up and don't share them.**
 - [x] ≥ 3 passing tests: **9 unit tests** + e2e + lifecycle demo
 - [x] CI/CD workflow — badge live at pritamscodee/peervotecli
 - [x] Idea from the approved list: [Private Voting](PRODUCT_PROPOSAL.md)
-- [ ] 1-minute demo video: `npm run cli` → `1` → vote ×3 → `1` → `4` → `1`
+- [x] Live demo: [peervotecli.vercel.app](https://peervotecli.vercel.app)
+- [x] Demo video: [YouTube](https://www.youtube.com/watch?v=lIwQ5XV-n00)
 - [ ] X profile link
 
 ## License
