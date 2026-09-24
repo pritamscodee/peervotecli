@@ -205,7 +205,15 @@ async function main() {
     console.log(`  ⚠ Could not verify the contract on the indexer (${error instanceof Error ? error.message : error}); continuing.\n`);
   }
 
-  const walletCtx = await createWallet({ network, networkConfig, seed: SEED });
+  let walletCtx: WalletContext;
+  try {
+    walletCtx = await createWallet({ network, networkConfig, seed: SEED });
+  } catch (error) {
+    console.error(`  ❌ Could not start the ${network} wallet:`, error instanceof Error ? error.message : error);
+    console.log(`     Check the node (${networkConfig.node}) and indexer (${networkConfig.indexer}) are reachable.`);
+    console.log('     If you recently upgraded the SDK, delete .midnight-wallet-state/ to force a fresh sync.\n');
+    throw error;
+  }
 
   // Ctrl+C: checkpoint sync progress so the next run doesn't resync from scratch.
   let shuttingDown = false;
