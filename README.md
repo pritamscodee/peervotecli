@@ -270,11 +270,15 @@ Everything on the ledger is public, so the design decides exactly what gets publ
 
 | ✅ An observer **can** see | ❌ An observer **cannot** see |
 |---|---|
-| The question and whether it's open or closed | **Who** voted |
-| The aggregate `tallyFor` / `tallyAgainst` | **How** any individual voted |
-| One opaque nullifier per ballot | The secret behind any nullifier (the hash is one-way) |
+| The question and whether it's open or closed | **Who** cast any ballot |
+| The aggregate `tallyFor` / `tallyAgainst` | Which *person* is behind a FOR or AGAINST |
+| One opaque nullifier per ballot, and which counter that ballot's transaction increased | The secret behind any nullifier (the hash is one-way) |
 | The authority's *public* key | The authority's admin secret |
-| Tx ids and block heights | Any link between two ballots |
+| Tx ids and block heights | Any link between two ballots from different secrets |
+
+**Precisely:** a ballot is *anonymous*, not *hidden*. Because `castVote` discloses the branch it
+takes, a chain observer can see "ballot `0x5c1e…` added one to FOR". What they can't learn is who
+holds the secret behind `0x5c1e…`.
 
 **Audit invariant:** `ballots.size() == tallyFor + tallyAgainst`. Nobody can
 quietly add, drop or flip a vote without breaking it.
@@ -283,6 +287,10 @@ quietly add, drop or flip a vote without breaking it.
 > can reach the contract can cast a ballot with a fresh secret. The CLI simulates
 > many voters from one terminal. A production version would add an eligibility
 > list (for example, a Merkle root of registered voter commitments) and prove membership inside `castVote`.
+>
+> ⚠️ **Fee payer:** every transaction's fee is paid by *some* wallet. In the CLI demo the organiser's wallet
+> pays for every ballot, so the anonymity here comes from the proof, not from who paid the fee.
+> Real voters should pay from their own wallet (the Lace path does this).
 
 ---
 
