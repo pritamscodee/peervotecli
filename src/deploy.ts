@@ -115,6 +115,14 @@ async function main() {
   console.log('╚══════════════════════════════════════════════════════════════╝\n');
   console.log(`  Question: "${question}"\n`);
 
+  // Fail fast: the proof server is only needed at the very end, after a sync that can take
+  // 30+ minutes on a fresh preprod wallet — don't discover it's down after all that.
+  if (!(await waitForProofServer(15, 2000))) {
+    console.log(`\n  ❌ Proof server not responding at ${networkConfig.proofServer}. Run: npm run proof-server:start\n`);
+    process.exit(1);
+  }
+  process.stdout.write('\r  Proof server reachable.                              \n');
+
   const walletCtx = await createWallet({ network, networkConfig, seed: SEED });
   const restoredCount = Object.values(walletCtx.restored).filter(Boolean).length;
   if (restoredCount > 0) {
