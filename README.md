@@ -280,6 +280,22 @@ Everything on the ledger is public, so the design decides exactly what gets publ
 takes, a chain observer can see "ballot `0x5c1e…` added one to FOR". What they can't learn is who
 holds the secret behind `0x5c1e…`.
 
+### 🔬 The privacy claim, and how to watch it happen
+
+> **Claim:** a voter proves "I hold a ballot secret that has never been used in this election"
+> without ever revealing the secret.
+
+You can observe this on every vote, in the CLI or in the browser:
+
+1. Before submitting, the client computes the nullifier **locally** from a fresh secret and prints it:
+   `local ballot id (predicted): 0x5c1e…`
+2. The proof is generated and the transaction lands. The chain discloses a ballot id.
+3. The client compares them: `Matches predicted id? ✅ yes`.
+
+The match shows the proof used *your* secret, yet the secret appears nowhere on-chain: search the
+transaction and you'll find only its hash. Try voting twice with the same secret and the circuit
+rejects it (`this voter has already cast a ballot`). `npm run election:demo` does exactly that.
+
 **Audit invariant:** `ballots.size() == tallyFor + tallyAgainst`. Nobody can
 quietly add, drop or flip a vote without breaking it.
 
