@@ -1,0 +1,20 @@
+web/src/lace-vote.ts
+  s_b84b4242fbbb95::t_1a1a3802c3fc41 148-191
+  s_b84b4242fbbb95::t_7fdd275e94d384 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "da90911bff4a034afb4ade4197983f958e45b8ce",
+  "prompts": {},
+  "sessions": {
+    "s_b84b4242fbbb95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b5e8135-4a2d-4bf4-b214-cd5dd5443d3e",
+        "model": "claude-opus-5-5"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
