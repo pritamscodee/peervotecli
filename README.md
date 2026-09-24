@@ -350,6 +350,24 @@ type-checks, runs the unit tests, then boots a devnet and runs the e2e and demo.
 
 ---
 
+## 📸 Screenshots
+
+Real output from this project (compile: CI run on `main`; deploy and tests: the author's machine).
+
+**Contract compiles, with both circuits and their proving/verifying keys generated in `contracts/managed/`**
+
+![compact compile output](docs/screenshots/compile.svg)
+
+**Contract deployed to preprod, with the address shown**
+
+![preprod deployment with contract address](docs/screenshots/deploy.svg)
+
+**Test suite: 9 passing**
+
+![npm test output](docs/screenshots/tests.svg)
+
+---
+
 ## 🩺 Troubleshooting
 
 | Symptom | Cause | Fix |
