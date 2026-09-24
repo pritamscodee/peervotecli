@@ -1,0 +1,19 @@
+web/public/election.json
+  s_b84b4242fbbb95::t_3a63ab3cdecf8a 1-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "af997256721537753d2e70cc71dbe9fbdb02d14e",
+  "prompts": {},
+  "sessions": {
+    "s_b84b4242fbbb95": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0b5e8135-4a2d-4bf4-b214-cd5dd5443d3e",
+        "model": "unknown"
+      },
+      "human_author": "pritamscodee <codewithpritam29@gmail.com>"
+    }
+  }
+}
