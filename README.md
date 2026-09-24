@@ -44,6 +44,17 @@ Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed 
 
 > Idea from the Midnight idea list: **[Private Voting](PRODUCT_PROPOSAL.md)**
 
+### 💡 Product idea
+
+Student councils, DAOs, clubs and small organisations run polls where people won't vote honestly
+if their choice can be traced back to them, yet the result still has to be trustworthy.
+PeerVote lets an organiser open a yes/no question on Midnight. Each voter proves in zero
+knowledge that they hold a ballot secret nobody has used before, and the chain records only a
+one-way nullifier and a +1 on the FOR or AGAINST counter. Nobody, including the organiser, can
+link a ballot to a person, but anyone can check that every ballot was counted exactly once. The
+[full proposal](PRODUCT_PROPOSAL.md) covers scope, users and the roadmap (voter eligibility
+lists, multi-option ballots, scheduled close).
+
 
 **Live on preprod**
 
