@@ -231,12 +231,11 @@ async function main() {
         const expectedId = ballotIdFromSecret(secret);
         console.log(`  local ballot id (predicted): 0x${toHex(expectedId)}`);
 
-        const voter = await connect(providers, deployment.address, {
-          privateStateId: `voter-${toHex(secret).slice(0, 16)}`,
-          initialPrivateState: { ballotSecret: secret },
-        });
-
         try {
+          const voter = await connect(providers, deployment.address, {
+            privateStateId: `voter-${toHex(secret).slice(0, 16)}`,
+            initialPrivateState: { ballotSecret: secret },
+          });
           const tx = await withSubmitRetry('Ballot', () => voter.callTx.castVote(forVote));
           const ballotId = circuitOutputToBytes(tx);
           const matched = Buffer.from(ballotId).equals(Buffer.from(expectedId));
