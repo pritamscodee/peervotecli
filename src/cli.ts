@@ -256,8 +256,13 @@ async function main() {
   const syncInterval = setInterval(() => {
     process.stdout.write(`\r  ⏳ Still syncing... (${Math.round((Date.now() - syncStart) / 1000)}s elapsed)   `);
   }, 5000);
+  // Checkpoint during long syncs so a crash or network failure doesn't throw the progress away.
+  const checkpointInterval = setInterval(() => {
+    persistWalletState(network, walletCtx).catch(() => {});
+  }, 60_000);
   await walletCtx.wallet.waitForSyncedState();
   clearInterval(syncInterval);
+  clearInterval(checkpointInterval);
   process.stdout.write('\r  ✓ Synced with network.                                      \n');
 
   await persistWalletState(network, walletCtx);
