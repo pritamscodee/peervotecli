@@ -9,7 +9,7 @@
 ╚═╝     ╚══════╝╚══════╝╚═╝  ╚═╝  ╚═══╝   ╚═════╝    ╚═╝   ╚══════╝
                              C  L  I
 ```
-
+Demo on youtube : https://www.youtube.com/watch?v=lIwQ5XV-n00
 ### Anonymous, zero-knowledge yes/no voting — from your terminal, on Midnight.
 
 Every ballot is a ZK proof. The only public trace of a vote is a one-way hashed nullifier.
