@@ -173,6 +173,22 @@ async function main() {
   console.log(`  Network: ${network}\n`);
 
   const walletCtx = await createWallet({ network, networkConfig, seed: SEED });
+
+  // Ctrl+C: checkpoint sync progress so the next run doesn't resync from scratch.
+  let shuttingDown = false;
+  process.on('SIGINT', async () => {
+    if (shuttingDown) process.exit(130);
+    shuttingDown = true;
+    console.log('\n\n  Saving wallet state before exit... (Ctrl+C again to force)');
+    try {
+      await persistWalletState(network, walletCtx);
+      await walletCtx.wallet.stop();
+    } catch (error) {
+      console.error('  ⚠ Could not save wallet state:', error instanceof Error ? error.message : error);
+    }
+    process.exit(130);
+  });
+
   const restoredCount = Object.values(walletCtx.restored).filter(Boolean).length;
   if (restoredCount > 0) {
     console.log(`  Restored ${restoredCount}/3 child wallets from .midnight-wallet-state — sync will resume from saved point.`);
